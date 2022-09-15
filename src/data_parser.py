@@ -42,11 +42,26 @@ def read_r_matrix(file_path: str) -> (np.ndarray, Id_Converter, Id_Converter):
     
     return r, user_ids, item_ids
 
-def get_rmse(predictions, targets):
-    """Calculates the root mean squared error between predictions and targets"""
-    return np.sqrt(((predictions - targets) ** 2).mean())
+def get_rmse(predictions: np.ndarray, true_values: np.ndarray):
 
+    """Calculates the root mean squared error between the predictions and the targets"""
+    return np.sqrt(((predictions - true_values) ** 2).mean())
 
+def split_train_test_val(input_data: dict, test_size: float = 0.1, val_size: float = 0.1) -> (np.ndarray, np.ndarray):
+            
+    """Splits the ratings matrix into train, test and validation"""
+    test = {}
+    train = {}
+    val = {}
+    for (user, item), rating in input_data.items():
+        if np.random.rand() < test_size:
+            test[(user, item)] = rating
+        elif np.random.rand() < val_size + test_size:
+            val[(user, item)] = rating
+        else:
+            train[(user, item)] = rating
+    
+    return train, test, val
 
 def append_integer_ids_to_df(df: pd.DataFrame) -> (pd.DataFrame, Id_Converter, Id_Converter):
     """Associates user and item string ids to integer ones and adds to the dataframe"""
