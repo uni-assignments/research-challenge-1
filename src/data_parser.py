@@ -24,7 +24,7 @@ class Id_Converter:
         return len(self.dict)
 
 
-def read_as_matrix(file_path: str) -> (np.ndarray, Id_Converter, Id_Converter):
+def read_r_matrix(file_path: str) -> (np.ndarray, Id_Converter, Id_Converter):
     """Reads a file and returns a r matrix"""
     
     r = {}
@@ -32,15 +32,20 @@ def read_as_matrix(file_path: str) -> (np.ndarray, Id_Converter, Id_Converter):
     item_ids = Id_Converter()
 
     f = open(file_path, "r")
+    next(f)
     for line in f:
         line = line.replace('\n', '').replace(':', ',').split(',')
         user_int_id = user_ids.__create_new_id__(line[0])
         item_int_id = item_ids.__create_new_id__(line[1])
-        
         r[(user_int_id, item_int_id)] = line[2]
-    
     f.close()
+    
     return r, user_ids, item_ids
+
+def get_rmse(predictions, targets):
+    """Calculates the root mean squared error between predictions and targets"""
+    return np.sqrt(((predictions - targets) ** 2).mean())
+
 
 
 def append_integer_ids_to_df(df: pd.DataFrame) -> (pd.DataFrame, Id_Converter, Id_Converter):
