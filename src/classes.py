@@ -1,53 +1,50 @@
 import numpy as np
 import time
 
-class Table:
+class Id_Converter:
     """Contains all relevant info about the element"""
     def __init__(self):    
         """Converts string ids to unique integer ids and stores relation in a dictionary"""
-        self.id_converter = {}
-        """Stores the list of ratings relative to the element"""
-        self.ratings = {}
-        """Stores the mean of the ratings relative to the element"""
-        self.means = {}
+        self.user_ids = {}
+        self.item_ids = {}
 
-    def size(self):
-        return len(self.id_converter)
+        """Global mean rating"""
+        self.global_number_of_ratings = 0
+        self.sum_of_all_ratings = 0
+
+    def get_number_of_users(self) -> int:
+        """Returns the number of users"""
+        return len(self.user_ids)
     
-    def element_exists(self, id: str):
-        return id in self.id_converter
+    def get_number_of_items(self) -> int:
+        """Returns the number of items"""
+        return len(self.item_ids)
 
-    def add_id(self, old_id: str) -> int:
+    def add_id(self, type: str, old_id: str) -> int:
         """Checks if the id is already in the dictionary, if not adds it and returns the new id"""
-        if not self.element_exists(old_id):
-            self.id_converter[old_id] = len(self.id_converter)
-        return self.id_converter[old_id]
-
-    def convert(self, old_id: str) -> int:
-        """Converts the string id to the integer id"""
-        return self.id_converter[old_id]
-
-    def add_rating(self, id: int, rating: int):
-        if id in self.ratings:
-            self.ratings[id].append(rating)
+        
+        if type == 'User':
+            if old_id not in self.user_ids:
+                self.user_ids[old_id] = len(self.user_ids)
+            return self.user_ids[old_id]
         else:
-            self.ratings[id] = [rating]
+            if old_id not in self.item_ids:
+                self.item_ids[old_id] = len(self.item_ids)
+            return self.item_ids[old_id]
 
-    def get_rating(self, id: int):
-        return self.ratings[id]
+    def convert_user(self, old_id: str) -> int:
+        """Converts the string id to the integer id"""
+        return self.user_ids[old_id]
+    
+    def convert_item(self, old_id: str) -> int:
+        """Converts the string id to the integer id"""
+        return self.item_ids[old_id]
 
-    def compute_mean(self):
-        for id, ratings in self.ratings.items():
-            self.means[id] = sum(ratings) / len(ratings)
-            
-    def get_mean(self, id: int):
-        return self.means[id]
+    def add_rating(self, rating: int) -> None:
 
+        self.sum_of_all_ratings += rating
+        self.global_number_of_ratings += 1
 
-class User_Table (Table):
-  def __init__(self):
-    super().__init__()
+    def get_global_mean(self) -> float:
+        return self.sum_of_all_ratings / self.global_number_of_ratings
 
-class Item_Table (Table):
-  def __init__(self):
-    super().__init__()
